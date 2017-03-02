@@ -14,12 +14,10 @@ pip install -r requirements.txt
 cd todoist
 npm install
 
-# build for production with minification
-npm run build
-
 # Back to the backend
 cd ..
 
 # Run the server
-python server.py
+python server.py &
+cd todoist && nvm run dev
 ```
