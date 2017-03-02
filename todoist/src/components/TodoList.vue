@@ -1,11 +1,19 @@
 <template>
-    <div>
-        <input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="newTodo" @keyup.enter="addTodo">
-        <ol v-if="todos">
+    <div id="todo-list">
+        <form id='todo-form' v-on:submit.prevent="addTodo">
+            <v-text-input 
+                id="new-todo" 
+                placeholder="What needs to be done?"
+                name="new-todo" 
+                label="New Todo" 
+                v-model="newTodo"
+            ></v-text-input>
+            <button type="submit" style="display: none">Submit</button>
+        </form>
+        <ol id="todos" v-if="todos">
             <li v-for="todo in todos">
-                <input type="checkbox" id="checkbox" v-on:click="updateTodo(todo)" v-model="todo.done">
-                {{ todo.text }}
-                <i v-on:click="deleteTodo(todo)"> ✖ </i>
+                <a v-on:click="deleteTodo(todo)"><v-icon v-on:click="deleteTodo(todo)">close</v-icon></a>
+                <v-checkbox :label=todo.text class="todo-check" :id="'todo' + todo.id" v-model="todo.done" v-on:input="updateTodo(todo)"></v-checkbox>
             </li>
         </ol>
     </div>
@@ -36,21 +44,21 @@ export default {
         text: this.newTodo,
         done: false
       }
-      axios.post('http://localhost:5000/api/todo', todo)
+      axios.post('/api/todo', todo)
       this.newTodo = ''
       this.getTodos()
     },
     getTodos: function () {
       var vm = this
-      axios.get('http://localhost:5000/api/todo').then(function (response) {
+      axios.get('/api/todo').then(function (response) {
         vm.todos = response['data']['objects']
       })
     },
     updateTodo: function (todo) {
-      axios.put('http://localhost:5000/api/todo/' + todo.id, todo)
+      axios.put('/api/todo/' + todo.id, todo)
     },
     deleteTodo: function (todo) {
-      axios.delete('http://localhost:5000/api/todo/' + todo.id)
+      axios.delete('/api/todo/' + todo.id)
       this.todos[todo.id]
       for (let i = this.todos.length - 1; i >= 0; i--) {
         if (this.todos[i].id === todo.id) {
@@ -64,4 +72,22 @@ export default {
   </script>
 
 <style>
+  #todo-list {
+      padding: 2rem 35%;
+  }
+  #todos {
+      list-style: none;
+  }
+  #todos > li > div > label {
+      display: inline;
+  }
+  .todo-check {
+      display: inline;
+  }
+  /* Smartphones (portrait) ----------- */
+  @media only screen and (max-width : 500px) {
+      #todo-list {
+          padding: 2rem 10%;
+      }
+  }
 </style>
